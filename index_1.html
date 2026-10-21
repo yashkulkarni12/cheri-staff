@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3D1D0E"><meta name="apple-mobile-web-app-capable" content="yes"><title>Chéri Staff Book</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap"><style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px)}</style>
+<style>
+/* Layout: one-column phone app, sticky brand bar on top, fixed tab bar at the bottom; cards per staff member. */
+:root {
+  --bg: #F5EEE4; --surface: #FFFDF9; --sunk: #EFE5D8; --ink: #3D1D0E; --muted: #8A7461; --line: #E2D3BF;
+  --accent: #B07A4A; --accent-ink: #FFFDF9; --good: #4F7A45; --good-bg: #E4EEDC; --warn: #A8701F; --warn-bg: #F6E8CF;
+  --bad: #A9452F; --bad-bg: #F6DED6; --info: #5C6F8A; --info-bg: #E2E8F0;
+  --font: "Open Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1C130D; --surface: #281C14; --sunk: #221810; --ink: #F3E9DC; --muted: #B6A28E; --line: #3D2D21;
+  --accent: #D49C66; --accent-ink: #1C130D; --good: #93BA84; --good-bg: #253322; --warn: #E3B260; --warn-bg: #3A2D17;
+  --bad: #E98670; --bad-bg: #3B211A; --info: #9DB2CF; --info-bg: #222B37; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #1C130D; --surface: #281C14; --sunk: #221810; --ink: #F3E9DC; --muted: #B6A28E; --line: #3D2D21;
+  --accent: #D49C66; --accent-ink: #1C130D; --good: #93BA84; --good-bg: #253322; --warn: #E3B260; --warn-bg: #3A2D17;
+  --bad: #E98670; --bad-bg: #3B211A; --info: #9DB2CF; --info-bg: #222B37; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button, input, select { font: inherit; color: inherit; }
+.wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 110px; display: grid; gap: 14px; }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .in { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.logo { height: 34px; width: auto; display: block; }
+.logo.cream { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo.brown { display: none; } :root:not([data-theme="light"]) .logo.cream { display: block; } }
+:root[data-theme="dark"] .logo.brown { display: none; } :root[data-theme="dark"] .logo.cream { display: block; }
+.ttl { text-align: right; }
+.ttl b { display: block; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.ttl span { font-size: 13px; color: var(--ink); font-weight: 600; }
+
+h2 { font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 6px 2px 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sp { flex: 1; min-width: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.num { font-variant-numeric: tabular-nums; }
+
+.datebar { display: flex; align-items: center; gap: 8px; }
+.datebar input { flex: 1; min-width: 0; }
+.iconbtn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 20px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+input[type=date], input[type=month], input[type=time], input[type=number], input[type=text], select {
+  height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0 12px; width: 100%; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.f { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--muted); min-width: 0; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 8px; text-align: center; }
+.stat b { display: block; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+
+.staff { display: grid; gap: 10px; }
+.sname { font-weight: 700; font-size: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.c-good { background: var(--good-bg); color: var(--good); }
+.c-warn { background: var(--warn-bg); color: var(--warn); }
+.c-bad { background: var(--bad-bg); color: var(--bad); }
+.c-info { background: var(--info-bg); color: var(--info); }
+.c-mute { background: var(--sunk); color: var(--muted); }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.seg button { height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 13px; font-weight: 600; cursor: pointer; }
+.seg button[aria-pressed=true][data-s=present] { background: var(--good-bg); color: var(--good); border-color: var(--good); }
+.seg button[aria-pressed=true][data-s=half] { background: var(--info-bg); color: var(--info); border-color: var(--info); }
+.seg button[aria-pressed=true][data-s=leave] { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+.seg button[aria-pressed=true][data-s=absent] { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
+.times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tbox { background: var(--sunk); border-radius: 12px; padding: 8px 10px; display: grid; gap: 6px; }
+.tbox .lab { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+.tbox input { height: 40px; background: var(--surface); }
+.btn { height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); padding: 0 16px; font-weight: 600; cursor: pointer; }
+.btn.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.dark { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.btn.sm { height: 36px; padding: 0 12px; font-size: 13px; }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.full { width: 100%; }
+
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+nav.tabs .in { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+nav.tabs button { background: none; border: 0; padding: 9px 4px 10px; display: grid; justify-items: center; gap: 3px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+nav.tabs button svg { width: 24px; height: 24px; }
+nav.tabs button[aria-current=page] { color: var(--accent); }
+
+.empty { text-align: center; padding: 28px 18px; }
+.empty b { display: block; font-size: 17px; margin-bottom: 6px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 9px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); }
+th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; background: var(--sunk) !important; }
+tr.tot td { font-weight: 700; border-bottom: 0; }
+td.neg { color: var(--bad); } td.pos { color: var(--good); }
+.pay { display: grid; gap: 6px; }
+.pay .l { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.pay .l.big { font-size: 18px; font-weight: 700; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 2px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
+.note { font-size: 13px; color: var(--muted); }
+.banner { background: var(--warn-bg); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 600; }
+details summary { cursor: pointer; font-weight: 600; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+@media (max-width: 380px) { .stats { grid-template-columns: repeat(2, 1fr); } .seg button { font-size: 12px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head><body>
+<header class="top"><div class="in">
+  <div><img class="logo brown" alt="Chéri Café &amp; Eatery" src="data:image/png;base64,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"><img class="logo cream" alt="Chéri Café &amp; Eatery" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQQAAACqCAYAAABLaTEgAAAz40lEQVR42u19eZxdR3Xmd6rq3vuW1mbJMraR8UKcgDHYseMJS0AGQ9gMAWxgkiHAhGAICRACCUkGJIewDGuAQMJkGALBwMhAwhZIIEgGjCdGxgteQNjYYBtblrBa/d5daj3zx723+6nVklpWd6tbqu/3e/36vXfXunW+OufUqXMIEUcsmFkBABG5ke+Odzo/h4R4BAOnEbCWmVeTIIWAMjBvJ6JfENFNwfENSbd7PRENAIAABOYEgCMiji0cEbE0iICYWbafB4PBcc6YS7wpvuBtdae3Je8Nu/c3Ovfe6R96X/2jtfZZzD/rjpxDxpaOiFjk2LRp06SgclU9jL19t7P67umCbnV+h9PFN6zJP+l0ucXq3FiTX+ZM8Vmn8+9aXdzL7PYgCO+q64zJX8PMK2pS2CCYmWKrR0QsLo1ANC8JAOPj46u81e/0rtrdCrOz1Th7/RVT5a/WevgoHh9f1e7vnP5dbwtmvrs3eczh8Hhryydam7/dmuJa9pqnjlX+0Lnid6K2EBGxyE0EWw6e5J25dkp49c+91W9n5ofOsF/CzNK58g9qQshPYGY5fdTfunVrwmyf7J3+vNV5rTYEx96Wn2GeOBYANjf+ioiIiMNPBgIAnMn/yNkqZw7sbOm8rT7CXJ48sq1qXmKURJwrX1ETwuC4kWMSMwvevHkPQWdbPtE7e0VrTnhvtpl8/NdagolPJCLi8BCBbF8A4HX+Ng62VenvtLa6cBoR7GXvTxKCKV/hphHCTBpISzx8442ptflGZwrbnG+3rXY/PZoPERGHVzNQAGB1/o56xA7sdHllWZantILbCvG+SGU2hDADEREAWJs/19lyZ3CavTNDWw4uaLbJ4hOKiFhYQkgbM+EPOZh2FuCrzNxrtYLZaBkHSwjTyciY8V9zptgevGVnq13G5Oc224j4lCIiFoIMmqlFtuWTvdOW2bPTxeZ2loCZl81GIB8oIUySAurt2OTnWlP8gpnZmvwWHh8/ZibnZERExNxrBoKZacCDtc4UP2Zmdqa4Pc/zE6bb8LMY6R+ohiAAoNq9+/RWI7FVfpF3WjMHttXgY9GfEBGxQIRQ+w2Gf1sHGRWaTfHYUTPCmPyPmavTD6S6P1AfQksAzuR3MN+/YsSX8c7adNHe2vLJkRQiIuaXDCQzE5viMdYUVU0Iww80vyWtYHpbfMDq/MdtnMG+SOFgCGHUb8BcrLM6L5wr/uvIDIRk3rncmfwWZmZbDa9uzk+RFCIi5oUQat+BqfLLGu3grp/9rF5fMDkl2Aiz0+UV3hS16r5z5/KZSOEgCUEwc8bMZE1xndXF+5vvs9EoSVsNnx6cZg6WnS5e0GwTg5YiIubDVOCyPM2ZcoI5sDPFn9pycD4zH9tud2M91Zgy8xqr83Hnihe3GsQhEkIT71B80JniGhCBmTtNjAM113YKMx9j9PAbzBysHl4xFQSF6GCMiJhDQqjNAV1e2ixQuifP8xOtzn/kdPGFEbNBtL4EWw7WW12UVTXx8NFR/GAJYXI7XbzQ6HyCOX/wiKnQvnec1duszi+1tnwys2dnSsPGnHcgX0ZERMTBEwIxs7JVfg0zB2/KTwAAm/w8ZsfG5JdMMx0aYS/+wur8J8zcbTQHdTCEMHW86nSr88La4dNG9510KJryE86W9zIP1jLzCquLnzMzW5v/dTQbIiLmwVzQenCmM4UOwbG11XMm/QUmf3nwhvVw11nTSEHVI3v+b84Un6+/uzGdBSGIdtvGJMicKW61On9r6zfY4/hu+DJmZmPy89pjW5N/nJmDs/mVzJtaTSKaDRERh0wIzQIjrYe/35gLO5iHxzdC2WlG6H9yptrO99+/YmTxUvtaZk2x05n8tdNG9/1qCK3fwVb5PzldXNV8123XRgCAHtz/yNo8yF81ShZOF7/dXOtuLoqTAIA3bIhmQ0TEnPkPbPk+ZmZvyytHhL7NhZA6q29xRn+52Sdtf6tNi+LRVue51sOzWzKYiRBGjikBQJfDl1md/4J54tiRc7XbjHln7rIm/0x7nZP76eHZThcmeMNsywtGCShi8SIy9tJAAAAOdU6DwOE2IgoARPMOIjLOV8+SSjzDmfwPicgAUEQUmFlS2ruKiN4kSHyNmVcC4Jmef50r8RpJRF7rwRlC0AchxPOIlu9ofg8AJBGFYKtPAGxV0ntZQzy+vdY0zX/M4HtJJPDOn9QePj7KxY3o6FmE/oJWyFv1vRFq4U35oPpL3DVNiAMzp0T0Y60HL0jTsf9rTHENEV3VaBeBmRURvdeZ4rHWFJelWf8Z06ci85xaOz8wc8/Z4isc+C1p0t3S7O/ad1flrxUqeY4242d01Jphc9085SdYW4CKHQDWQYrjZuMjAS4n4OKYvPUwdr9WxePI3ocbN0ngjNA8i71wxx13pA8+Ye2yRoB2AwC2bKERUjDMmxXRsk3eVr8hSH6Z8x1nArgX11wjcc45rhG832VT3Gyq4RuI6F3MTN5WTCD0+32uD0Xe6eJTRPTDpNN/W9NHfCP0zpjiMTLpvM+b4iWdzpqbmVkSkZ/SMGqSsjof1teL49sON9O9jRJgxGHWENoHGXHYsd/ncPLJJ5OzRa3RCTIAgPXrpwnYet+M+q/xrjrfJ8s+oYguaLQMbt5zPRw+SyTie9YOvk9E/+FMqRiMovhF0u+vCa4q3sDArw9z/SsNiYTJwXx8/BgP+oKz+uNJNvZxZs6ISM843ABN+veQ7kc7yIDi2KIA9wAqYj84LCDSsmvEQDFzJ5jiLRDy+MDsolPhcDkJQgqmCZV2/5SIJlohHtEQ+MEnrHW144eS6RpCOzozMwOQ0lUXBtXb5m25kYg2tqr+5s2bVTY2dr1z5SvZy88yb3uQNyhkkqKnujtZD3/VAW8PNvzaqlWrxpvRP0yaCqa4jEjcJ1V6SaM5mP04qBqTVJh9m0blWmfwgyyhMceMlEEgcBvZSAQwt/fX7jv7z/O1bft5vrad7+tvr6d59ypdlThV/C81Pj7eGeulr1Iq60YyOHwQk77D/FIAEzNoCMabsi6YQrxsZg0BAMgDrKi76nab589Vvd4Xy3L8/xHR1xrhbv0AH7VV/gRrTvikgP+Kd8ilNWudFF8i4jdkY2PXtqZASwamGr4JJJ5oXPmwbpLp1m8wTdBbbUR4Wy5rOuCO6U7FjRs31v8MvaZM3glgNREFBiTAk524Pj7TqDlycJ/na9v683xtO//X314PU91nggRjqFauXFmYKn8VfDXmQ0AIgeruGTDlhA57dNuZPy+GbRf6PIe+rRCiMRekArtcpv3xGUZ9QUTBmeIeAAiMh+xb9QMDZBsh/pK15bsT1bl8OLzvdCK6Z8rJuH0M6L3UmfwqkNiAEHY6RV8m0JUq7b1vyom4LSMizaZ4HJLuXzldPKfbXfkT3rxZjVaE2hs7+8y9NU1H3D7910svvbRugLGxnXJiYj2WLw/AOGN8z+3GAawc+R8H+Xm+tm0/z9e28339K6e/p13svH/CxqF5Kbh+p+IQ3lsnNS2u4k37j/4bXa7sbPkdZ6ur91yqzCkzE1fV6c6W9zlbsa3y65sFS9nosYfD4fHOVru8Lt7XHFvu51rroCc9PNuZwgZv2ZbDpxxov4hF4lScelBbaMsWYH1skwXHFgDr1wPAet6Hk5cBgIO/sbEFT8fTn762HvE3CMzgvW80iwAAlfYXdzN1mzPFu5Ks//rGFDDMnFKns82Z4r0y6bzdcvlKIqrq2YrzmZkT3rQp+ExdDsIdIu2+rhHq/c0KEDOTKYcPT7sd5Uw5rjr9m6apTNNvjiYN3IiIiANqCHW0YTXxcGdLzcGzrfLnzSb5SBv2zHZwQZ24JH9OOwi0qxWNyV9hde4Hg8HakXDnZnVl/g5nq4K5WDd6LQfSEKzJP8HMwen8O5PHjFPbERFzRgrNasfh95g5WJN//EAC2u4zuSLRlm91trJluevk5vc25dofWZ2HIQ8f1Hxfr2Eoh09lZuZqOKuaC62JsXv37tVWD+9u1jLE1Y4REfPlR7A6f0uTWPVe5ok1tdBvmHWGZaOLb3hnrm/WIiQA4Mr8FVbngZnXtoKd5zsf7J0uvZ1c4TjrtO7sihcxB/ZWa2PGYz6EiIh5MxvK8SZjErOphm+ezchdb7NZMbPYzbtXe2e3W1P871b4nclf4WzBw+Hw+EarSJ0tv+9t9a1Wk5iFqdAueCJbDb/bmAvfmlwMFc2FiIi5JoVNbcbjT9Y1EIp7eDh80GxyDTTZlGoToZh4PDOzc8VvA21NyILzPD+x1kKKDzlbDjjPTxjNwDQr30GVX+idCcyO2emLR/0YERERc6slNE7A4rHOlpqZ2evivc1vndkdoxZOZ/I/rmtB5g92evgi5sA33nhjaqv8OczMRTHxuNZUmI3voLm2vtXDm5iZnS6+NxvNIiIi4lBIoanaZHXx4bYugzETjz84UmgSppryC84U15gqf7Wz5Tib4nHOlIUzxetn6zeot9uWAYAtB++sa8oZF+syREQskC+hGZHXOpNva7Iv/4TzOvHppoYwZnmMnjXFj5wtf2H18G5nynudKdsEK9ksr6d2TOriYu+sYQ5sTf7RSAYREQtICgDAtrzA2dIyB3a2/FYdjjxbJ2Obp3F4lnd64J0JzuS37d69e/VopqV9mwib1VTB1/y/OFsOmsIxNzPzMbwp1naMiFhIUmirP7+K2XOjKfzHjh07ls12hJ+cyiwHb2Pv/UhJuFn4DG7v1GRQPNqa4l72JjhbjXOs/hwRcdhIoSmekr+tLgnv2dnyyrLcdUpLGvsTzM2bNyvmDcKZ/BXOFG42cQ2jVZ1tlV/kbHU/e83emQlrBxeM+hQiIiIWlhBoihTKt9SaArMzxV3WVs+ZSYhnIhRnykucKQLzYDIwado5aLRGJG/blvk66tHUi63KXSMLmJJoKkREHF5SEADgyvxVzlbDxqfgvDUfZS5PnbatGnEqzpiGfcOGDWKEBPYY7a0tL/DOfps51BMKVv+QTX7OqAkSERGxSDQFtuX5zlY3cANv9b3e6vcw8+kz+RCYWTpT/kFNCPkJM2kTzKysLS/w3nzO6KFtDszszacnJibWzMbvEBERsXCEIEZrKfCuXSvrhUzlrhFiuN+b4uvO5K9lrc9iHj+m3d/p4nedKZj57t4kweT5Ccz2AqvzdzhTXBd8xVPHKm90urh46vxbk/gUjgxEW+8IJIc2i3FZjj80Vf1LGOH5UqUnTRKAKRwR7gLoDgbfTcDxzHgsCJ8jUAaiE8B8qkyS46Yy9Qd4Z68D80fHJ/JPrFmzZqLRJChmTY6IWCImBAAMBoPj2On/7vTwC85WdzE7ng2szq0z+Q+9139vrX1WO9UYTYSoIUQsUW2hGcEnszDxYHCcU+oRJMOZzHQKiI4hDmsCIARRweD7wdgVwLekwPeR7v4R0YlFSzQAJAA/PblqRCSEiCWkMaDO7soPRL1vtYFYwyMi4gg1J9rQ43ZWYSSfwej3IsYUREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREQcLEZK1gvesEG01aJiy0REHH1kQPv5LY0ttHigYhNEzLdmQEShKibenGW9x3hnHAgEwEOITGv9WgC3tNvFFouIOILJAACsrZ7Be8AxM7PX+XuYWWzatEnG1oqIOKLZAFRXkZ5Y423xE++0szrPrc6LECwbPfx8a04QRVdCRMSRrh1IALDV8J+Yma0ellbnhtmxs+UPmPmYDY1zMbZWRMRRQAZOF89nDmx1rm01tM6Wzll9v9bDR42aFBEREUcsGdzeaaYUH2R1cZdzxluda2dKHbxhW+XPGSWNiIiII1s7SBtT4VONqaCtzitmZlNNbGi2ibNb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"></div>
+  <div class="ttl"><b id="hdrTop">Staff Book</b><span id="hdrSub">Attendance &amp; payroll</span></div>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="tabs" aria-label="Sections" id="tabs" hidden><div class="in">
+  <button data-tab="today" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>Today</button>
+  <button data-tab="staff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5"/></svg>Staff</button>
+  <button data-tab="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M10 20V4M15 20v-7M20 20V8"/></svg>Payroll</button>
+  <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2 1.2M17.8 15.3l2 1.2M4.2 16.5l2-1.2M17.8 8.7l2-1.2"/></svg>Settings</button>
+</div></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+/* ==========================================================
+   PASTE YOUR APPS SCRIPT WEB APP URL HERE (ends with /exec)
+   ========================================================== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzHv8FnlSgA1PRva386fd4FpxYI-36Ap9ILApCUmgL2dyloId2sr-SKP2Jv6D48fgbZ6A/exec';
+</script>
+<script>
+(() => {
+'use strict';
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const toMin = hm => { if (!hm) return null; const [h, m] = String(hm).split(':').map(Number); return h * 60 + m; };
+const fmtHM = hm => { if (!hm) return '—'; let [h, m] = String(hm).split(':').map(Number); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return `${h}:${pad(m)} ${ap}`; };
+const fmtDur = m => { m = Math.round(m || 0); if (!m) return '0m'; const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}h ${r}m` : `${h}h`) : `${r}m`; };
+const rs = v => '₹' + Math.round(v || 0).toLocaleString('en-IN');
+const rs2 = v => '₹' + (Math.round((v || 0) * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const monthOf = iso => iso.slice(0, 7);
+const daysIn = ym => { const [y, m] = ym.split('-').map(Number); return new Date(y, m, 0).getDate(); };
+const dayLabel = iso => new Date(iso + 'T00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+const monthLabel = ym => { const [y, m] = ym.split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); };
+const shiftISO = (iso, d) => { const t = new Date(iso + 'T00:00'); t.setDate(t.getDate() + d); return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`; };
+const localToday = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const LS = { get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set: (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+let toastT;
+const toast = (msg, ms = 2600) => { let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, ms); };
+const distM = (a, b, c, d) => { const R = 6371000, r = x => x * Math.PI / 180, dl = r(c - a), dg = r(d - b); const h = Math.sin(dl / 2) ** 2 + Math.cos(r(a)) * Math.cos(r(c)) * Math.sin(dg / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
+const locLabel = v => !v ? '' : String(v).startsWith('PC:') ? `on ${String(v).slice(3)}` : `${v} m from café`;
+
+/* ---------- state ---------- */
+const S = {
+  token: LS.get('cheri-token'), me: null, staff: [], settings: {}, att: {}, months: new Set(),
+  today: localToday(), tab: 'today', date: localToday(), month: monthOf(localToday()),
+  kiosk: LS.get('cheri-kiosk'), busy: null, loading: false, editStaff: null, delConfirm: false, detail: null, geo: null, msg: '',
+};
+const STATUS = { present: 'Present', half: 'Half-day', leave: 'On leave', absent: 'Absent' };
+const isAdmin = () => !!(S.me && S.me.isAdmin);
+
+/* ---------- API ---------- */
+async function api(action, data = {}) {
+  if (!/^https:\/\/script\.google\.com\//.test(API_URL)) throw new Error('The app is not connected yet. Paste your Apps Script URL into index.html.');
+  let res;
+  try {
+    res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, token: S.token, ...data }) });
+  } catch { throw new Error('No connection. Check the internet and try again.'); }
+  let j; try { j = await res.json(); } catch { throw new Error('The server did not answer properly. Try again in a minute.'); }
+  if (!j.ok) { if (j.code === 'auth' && action !== 'login') { logoutLocal(); toast(j.error); } const e = new Error(j.error || 'Something went wrong'); e.code = j.code; throw e; }
+  return j;
+}
+function putRecords(list) { (list || []).forEach(r => { S.att[r.id] = r; }); }
+async function loadMonth(ym, force) {
+  if (!S.token || (!force && S.months.has(ym))) return;
+  S.months.add(ym);
+  try { const j = await api('month', { month: ym }); Object.keys(S.att).forEach(k => { if (S.att[k].month === ym) delete S.att[k]; }); putRecords(j.records); render(); }
+  catch (e) { S.months.delete(ym); toast(e.message); }
+}
+async function boot() {
+  if (!S.token) { render(); return; }
+  S.loading = true; render();
+  try {
+    const j = await api('bootstrap');
+    S.me = j.me; S.staff = j.staff; S.settings = j.settings; S.today = j.today; S.date = j.today; S.month = monthOf(j.today);
+    S.att = {}; putRecords(j.records); S.months = new Set([S.month]);
+  } catch (e) { if (e.code !== 'auth') S.msg = e.message; }
+  S.loading = false; render(); armIdle();
+}
+function logoutLocal() { S.lastUser = null; S.token = null; S.me = null; S.staff = []; S.att = {}; S.months = new Set(); S.tab = 'today'; S.editStaff = null; S.detail = null; LS.set('cheri-token', null); render(); }
+async function logout() { try { await api('logout'); } catch {} logoutLocal(); }
+
+/* café PC: log out after inactivity so the next person starts fresh */
+let idleT;
+function armIdle() { clearTimeout(idleT); if (S.kiosk && S.token) idleT = setTimeout(() => { logout(); toast('Logged out for the next person'); }, isAdmin() ? 300000 : 60000); }
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => S.kiosk && S.token && armIdle(), { passive: true }));
+
+/* ---------- location ---------- */
+function getPos() {
+  return new Promise(res => {
+    if (!navigator.geolocation) return res({ err: 'This browser cannot share location. Use the café PC instead.' });
+    navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }),
+      e => res({ err: e.code === 1 ? 'Location permission is off. Allow location for this site, then try again. Or use the café PC.' : 'Could not get your location. Turn on GPS and try again, or use the café PC.' }),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+  });
+}
+
+/* ---------- pay maths ----------
+   Per-minute rate = hourly rate / 60 (₹60/hr → ₹1 a minute, so 15 min late = ₹15).
+   Late = check-in after shift start (minus grace). Overtime = check-out after shift end.
+   Day pay: present = full shift, half-day = half, leave = paid only if set, absent = 0. */
+const rules = () => ({ otMult: Number(S.settings.otMult) || 1, grace: Number(S.settings.grace) || 0, leavePaid: S.settings.leavePaid === true || S.settings.leavePaid === 'true' });
+function shiftMins(st) { let a = toMin(st.shiftStart), b = toMin(st.shiftEnd); if (a == null || b == null) return 0; if (b <= a) b += 1440; return b - a; }
+function dayCalc(st, rec) {
+  const R = rules(), out = { status: rec?.status || null, late: 0, ot: 0, worked: 0, base: 0, otPay: 0, ded: 0 };
+  if (!rec || !rec.status) return out;
+  const perMin = (Number(st.rate) || 0) / 60, sm = shiftMins(st);
+  const s0 = toMin(st.shiftStart); let s1 = toMin(st.shiftEnd); if (s1 <= s0) s1 += 1440;
+  if (rec.status === 'present' || rec.status === 'half') {
+    out.base = (rec.status === 'half' ? sm / 2 : sm) * perMin;
+    const i = toMin(rec.in);
+    if (i != null) { out.late = Math.max(0, i - s0 - R.grace); if (i - s0 < -600) out.late = 0; }
+    if (i != null && rec.out) {
+      let o = toMin(rec.out); if (o < i) o += 1440;
+      out.worked = o - i;
+      out.ot = Math.max(0, o - (rec.status === 'half' ? s0 + sm / 2 : s1));
+    }
+    out.otPay = out.ot * perMin * R.otMult;
+    out.ded = out.late * perMin;
+  } else if (rec.status === 'leave' && R.leavePaid) out.base = sm * perMin;
+  return out;
+}
+function monthCalc(st, ym) {
+  const r = { present: 0, half: 0, leave: 0, absent: 0, late: 0, lateDays: 0, ot: 0, worked: 0, base: 0, otPay: 0, ded: 0, net: 0, days: [] };
+  for (let d = 1; d <= daysIn(ym); d++) {
+    const iso = `${ym}-${pad(d)}`, rec = S.att[`${iso}_${st.id}`], c = dayCalc(st, rec);
+    if (c.status) r[c.status]++;
+    r.late += c.late; if (c.late > 0) r.lateDays++;
+    r.ot += c.ot; r.worked += c.worked; r.base += c.base; r.otPay += c.otPay; r.ded += c.ded;
+    if (rec && rec.status) r.days.push({ iso, rec, c });
+  }
+  r.net = r.base + r.otPay - r.ded;
+  return r;
+}
+const chipsFor = (rec, c) => {
+  const out = [];
+  if (rec && rec.status) out.push(`<span class="chip ${rec.status === 'present' ? 'c-good' : rec.status === 'half' ? 'c-info' : rec.status === 'leave' ? 'c-warn' : 'c-bad'}">${STATUS[rec.status]}</span>`);
+  else out.push('<span class="chip c-mute">Not marked</span>');
+  if (c.late > 0) out.push(`<span class="chip c-warn">Late ${fmtDur(c.late)} · −${rs2(c.ded)}</span>`);
+  if (c.ot > 0) out.push(`<span class="chip c-good">OT ${fmtDur(c.ot)} · +${rs2(c.otPay)}</span>`);
+  return out.join('');
+};
+
+/* ---------- views ---------- */
+function vLogin() {
+  const cfg = /^https:\/\/script\.google\.com\//.test(API_URL);
+  return `<div style="height:4vh"></div>
+  ${S.kiosk ? `<div class="banner" style="background:var(--info-bg);color:var(--info)">Café PC · ${esc(S.kiosk.name)} — staff can check in or out here if their phone has a problem. No location needed.</div>` : ''}
+  ${cfg ? '' : '<div class="banner">Not connected yet: paste your Apps Script web app URL into API_URL near the bottom of index.html.</div>'}
+  <form class="card" id="loginForm" style="display:grid;gap:14px">
+    <div><b style="font-size:20px">Log in</b><div class="muted small">Use the username and PIN your admin gave you.</div></div>
+    <label class="f">Username<input type="text" id="lg_user" autocomplete="username" autocapitalize="none" spellcheck="false" required value="${esc(S.lastUser ?? (S.kiosk ? '' : (LS.get('cheri-user') || '')))}"></label>
+    <label class="f">PIN<input type="password" id="lg_pin" inputmode="numeric" autocomplete="current-password" minlength="4" maxlength="8" required></label>
+    <button class="btn pri" type="submit" ${S.busy === 'login' ? 'disabled' : ''}>${S.busy === 'login' ? 'Logging in…' : 'Log in'}</button>
+  </form>
+  ${S.msg ? `<div class="banner">${esc(S.msg)}</div>` : ''}`;
+}
+
+function vMyDay() {
+  const me = S.staff.find(s => s.id === S.me.id) || S.me, today = S.today;
+  let rec = S.att[`${today}_${me.id}`];
+  const y = S.att[`${shiftISO(today, -1)}_${me.id}`];
+  const openYesterday = y && y.in && !y.out && (!rec || !rec.in);
+  const c = dayCalc(me, rec || {});
+  const canIn = !rec || (!rec.in && rec.status !== 'absent' && rec.status !== 'leave');
+  const canOut = (rec && rec.in && !rec.out) || openYesterday;
+  const m = monthCalc(me, S.month);
+  return `<div class="card" style="display:grid;gap:12px">
+    <div class="row"><div class="sp"><div class="muted small">Hello</div><div class="sname" style="font-size:20px">${esc(me.name)}</div><div class="muted small">${esc(dayLabel(today))} · Shift ${fmtHM(me.shiftStart)}–${fmtHM(me.shiftEnd)}</div></div><button class="btn sm" data-act="logout">Log out</button></div>
+    <div class="row" style="gap:6px">${chipsFor(rec, c)}</div>
+    <div class="times">
+      <div class="tbox"><span class="lab">Check-in</span><b class="num" style="font-size:20px">${rec && rec.in ? fmtHM(rec.in) : '—'}</b>${rec && rec.inDist ? `<span class="muted small">${esc(locLabel(rec.inDist))}</span>` : ''}</div>
+      <div class="tbox"><span class="lab">Check-out</span><b class="num" style="font-size:20px">${rec && rec.out ? fmtHM(rec.out) : openYesterday ? 'Open from yesterday' : '—'}</b>${rec && rec.outDist ? `<span class="muted small">${esc(locLabel(rec.outDist))}</span>` : ''}</div>
+    </div>
+    ${canIn ? `<button class="btn pri full" style="height:56px;font-size:17px" data-act="punch" data-k="in" ${S.busy ? 'disabled' : ''}>${S.busy === 'in' ? (S.kiosk ? 'Saving…' : 'Checking location…') : 'Check in now'}</button>` : ''}
+    ${canOut ? `<button class="btn dark full" style="height:56px;font-size:17px" data-act="punch" data-k="out" ${S.busy ? 'disabled' : ''}>${S.busy === 'out' ? (S.kiosk ? 'Saving…' : 'Checking location…') : 'Check out now'}</button>` : ''}
+    ${!canIn && !canOut ? `<div class="note">${rec && (rec.status === 'absent' || rec.status === 'leave') ? `You are marked ${STATUS[rec.status].toLowerCase()} today.` : 'You are done for today. See you tomorrow!'}</div>` : ''}
+    <div class="note">${S.kiosk ? `Café PC mode: no location check. You will be logged out automatically.` : `Works only within ${Number(S.settings.radiusM) || 400} m of the café. If your phone has a problem, use the café PC.`}</div>
+  </div>
+  ${S.kiosk ? '' : `<h2>${esc(monthLabel(S.month))}</h2>
+  <div class="card" style="display:grid;gap:10px">
+    <div class="row" style="gap:6px"><span class="chip c-good">${m.present} present</span><span class="chip c-info">${m.half} half</span><span class="chip c-warn">${m.leave} leave</span><span class="chip c-bad">${m.absent} absent</span></div>
+    <div class="pay"><div class="l"><span>Shift pay</span><span>${rs2(m.base)}</span></div><div class="l"><span>Overtime (${fmtDur(m.ot)})</span><span style="color:var(--good)">+${rs2(m.otPay)}</span></div><div class="l"><span>Late (${fmtDur(m.late)})</span><span style="color:var(--bad)">−${rs2(m.ded)}</span></div><div class="l big"><span>Estimated pay</span><span>${rs(m.net)}</span></div></div>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Date</th><th>Status</th><th>In</th><th>Out</th><th>Late</th><th>OT</th></tr></thead><tbody>${m.days.length ? m.days.slice().reverse().map(({ iso, rec, c }) => `<tr><td>${esc(dayLabel(iso))}</td><td>${STATUS[rec.status]}</td><td>${fmtHM(rec.in)}</td><td>${fmtHM(rec.out)}</td><td class="${c.late ? 'neg' : ''}">${c.late ? fmtDur(c.late) : '—'}</td><td class="${c.ot ? 'pos' : ''}">${c.ot ? fmtDur(c.ot) : '—'}</td></tr>`).join('') : '<tr><td colspan="6" class="muted" style="text-align:left">No entries yet this month</td></tr>'}</tbody></table></div>
+  <details class="card"><summary>Change my PIN</summary>${pinForm()}</details>`}`;
+}
+const pinForm = () => `<form id="pinForm" style="display:grid;gap:10px;margin-top:12px"><label class="f">Current PIN<input type="password" id="pin_old" inputmode="numeric" maxlength="8" required></label><label class="f">New PIN (4–8 digits)<input type="password" id="pin_new" inputmode="numeric" maxlength="8" required></label><button class="btn pri" type="submit">Change PIN</button></form>`;
+
+function vToday() {
+  const active = S.staff.filter(s => s.active !== false);
+  let p = 0, late = 0, a = 0, um = 0;
+  active.forEach(st => { const rec = S.att[`${S.date}_${st.id}`], c = dayCalc(st, rec);
+    if (!rec || !rec.status) um++; else if (rec.status === 'absent') a++; else if (rec.status === 'present' || rec.status === 'half') p++;
+    if (c.late > 0) late++; });
+  const isToday = S.date === S.today;
+  let h = `<div class="datebar"><button class="iconbtn" data-act="prevDay" aria-label="Previous day">‹</button><input type="date" id="dateIn" value="${S.date}" aria-label="Date"><button class="iconbtn" data-act="nextDay" aria-label="Next day">›</button></div>
+  <div class="row"><div class="sp"><b style="font-size:18px">${isToday ? 'Today' : esc(dayLabel(S.date))}</b> <span class="muted small">${isToday ? esc(dayLabel(S.date)) : ''}</span></div><button class="btn sm" data-act="refresh">Refresh</button>${isToday ? '' : '<button class="btn sm" data-act="goToday">Today</button>'}</div>
+  <div class="stats"><div class="stat"><b>${p}</b><span>In</span></div><div class="stat"><b style="color:var(--warn)">${late}</b><span>Late</span></div><div class="stat"><b style="color:var(--bad)">${a}</b><span>Absent</span></div><div class="stat"><b class="muted">${um}</b><span>Not marked</span></div></div>`;
+  if (!active.length) return h + `<div class="card empty"><b>No staff yet</b><p class="muted">Add your team in the Staff tab. Each person gets a username and PIN to check in.</p><p style="margin-top:12px"><button class="btn pri" data-act="newStaff">Add staff</button></p></div>`;
+  h += '<div class="staff">';
+  for (const st of active) {
+    const rec = S.att[`${S.date}_${st.id}`] || {}, c = dayCalc(st, rec), working = rec.status === 'present' || rec.status === 'half';
+    h += `<article class="card" style="display:grid;gap:12px">
+      <div class="row"><div class="sp"><div class="sname">${esc(st.name)}${st.isAdmin ? ' <span class="chip c-info">Admin</span>' : ''}</div><div class="muted small">${esc(st.role || 'Staff')} · ${fmtHM(st.shiftStart)}–${fmtHM(st.shiftEnd)} · ₹${esc(st.rate)}/hr</div></div>${rec.status ? `<button class="btn sm" data-act="clear" data-id="${st.id}" title="Remove this day's entry">Clear</button>` : ''}</div>
+      <div class="row" style="gap:6px">${chipsFor(rec, c)}</div>
+      <div class="seg" role="group" aria-label="Status for ${esc(st.name)}">${Object.keys(STATUS).map(k => `<button data-act="status" data-id="${st.id}" data-s="${k}" aria-pressed="${rec.status === k}">${k === 'half' ? 'Half' : k === 'leave' ? 'Leave' : STATUS[k]}</button>`).join('')}</div>
+      ${working ? `<div class="times">
+        <div class="tbox"><span class="lab">Check-in</span><input type="time" id="in_${st.id}" data-act="time" data-id="${st.id}" data-k="in" value="${esc(rec.in || '')}">${rec.inDist ? `<span class="muted small">${esc(locLabel(rec.inDist))}</span>` : ''}</div>
+        <div class="tbox"><span class="lab">Check-out</span><input type="time" id="out_${st.id}" data-act="time" data-id="${st.id}" data-k="out" value="${esc(rec.out || '')}">${rec.outDist ? `<span class="muted small">${esc(locLabel(rec.outDist))}</span>` : ''}</div>
+      </div>` : ''}
+      ${rec.edited === 'TRUE' ? '<div class="muted small">Edited by admin</div>' : ''}${c.worked ? `<div class="muted small num">Worked ${fmtDur(c.worked)}</div>` : ''}
+    </article>`;
+  }
+  return h + '</div>';
+}
+
+function vStaff() {
+  const e = S.editStaff;
+  let h = '<h2>Team &amp; logins</h2>';
+  if (e) {
+    h += `<form class="card" id="staffForm" style="display:grid;gap:12px">
+      <b style="font-size:16px">${e.id ? 'Edit ' + esc(e.name) : 'Add staff member'}</b>
+      <label class="f">Name<input type="text" id="sf_name" required value="${esc(e.name || '')}" placeholder="Full name"></label>
+      <label class="f">Role<input type="text" id="sf_role" value="${esc(e.role || '')}" placeholder="Barista, Kitchen, Server…"></label>
+      <div class="grid2"><label class="f">Username<input type="text" id="sf_user" required autocapitalize="none" spellcheck="false" value="${esc(e.username || '')}" placeholder="e.g. rohan"></label>
+      <label class="f">${e.id ? 'New PIN (leave blank to keep)' : 'PIN (4–8 digits)'}<input type="password" id="sf_pin" inputmode="numeric" maxlength="8" ${e.id ? '' : 'required'} autocomplete="new-password"></label></div>
+      <label class="f">Hourly rate (₹)<input type="number" id="sf_rate" inputmode="decimal" min="0" step="0.5" required value="${esc(e.rate ?? 60)}"></label>
+      <div class="grid2"><label class="f">Shift starts<input type="time" id="sf_s" required value="${esc(e.shiftStart || '11:00')}"></label><label class="f">Shift ends<input type="time" id="sf_e" required value="${esc(e.shiftEnd || '20:00')}"></label></div>
+      <div class="note num" id="sf_hint"></div>
+      <label class="row small" style="gap:8px"><input type="checkbox" id="sf_admin" ${e.isAdmin ? 'checked' : ''} style="width:20px;height:20px"> Admin access (can manage staff, payroll and settings)</label>
+      <label class="row small" style="gap:8px"><input type="checkbox" id="sf_active" ${e.active !== false ? 'checked' : ''} style="width:20px;height:20px"> Active (can log in and appears on Today)</label>
+      <div class="row"><button class="btn pri" type="submit" ${S.busy === 'staff' ? 'disabled' : ''}>${S.busy === 'staff' ? 'Saving…' : e.id ? 'Save changes' : 'Add to team'}</button><button class="btn" type="button" data-act="cancelStaff">Cancel</button></div>
+      ${e.id && e.id !== S.me.id ? (S.delConfirm ? `<div class="card" style="background:var(--bad-bg);border-color:var(--bad);display:grid;gap:10px"><b style="color:var(--bad)">Delete ${esc(e.name)} permanently?</b><label class="row small" style="gap:8px"><input type="checkbox" id="del_purge" style="width:20px;height:20px"> Also delete all their attendance history</label><div class="row"><button class="btn danger" type="button" data-act="deleteStaff" data-id="${e.id}">Delete permanently</button><button class="btn" type="button" data-act="cancelDelete">Keep</button></div><div class="note">To keep their records but stop the login, untick Active instead.</div></div>` : '<button class="btn danger" type="button" data-act="askDelete">Delete staff member</button>') : ''}
+    </form>`;
+  } else h += '<button class="btn pri full" data-act="newStaff">+ Add staff member</button>';
+  const list = [...S.staff].sort((a, b) => (a.active === false) - (b.active === false) || a.name.localeCompare(b.name));
+  if (!list.length) return h;
+  h += '<div class="staff">' + list.map(st => `<button class="card row" style="text-align:left;cursor:pointer;width:100%;${st.active === false ? 'opacity:.55' : ''}" data-act="editStaff" data-id="${st.id}">
+      <div class="sp"><div class="sname">${esc(st.name)} ${st.isAdmin ? '<span class="chip c-info">Admin</span>' : ''}${st.active === false ? ' <span class="chip c-mute">Inactive</span>' : ''}</div><div class="muted small">@${esc(st.username)} · ${esc(st.role || 'Staff')} · ${fmtHM(st.shiftStart)}–${fmtHM(st.shiftEnd)}</div></div>
+      <div style="text-align:right"><b class="num">₹${esc(st.rate)}</b><div class="muted small">per hour</div></div></button>`).join('') + '</div>';
+  return h;
+}
+
+function vReports() {
+  const ym = S.month;
+  let h = `<div class="datebar"><button class="iconbtn" data-act="prevMonth" aria-label="Previous month">‹</button><input type="month" id="monthIn" value="${ym}" aria-label="Month"><button class="iconbtn" data-act="nextMonth" aria-label="Next month">›</button></div>`;
+  if (!S.months.has(ym)) return h + '<div class="card empty"><b>Loading…</b></div>';
+  const list = S.staff.filter(s => s.active !== false || Object.values(S.att).some(r => r.month === ym && r.staffId === s.id));
+  if (!list.length) return h + `<div class="card empty"><b>No payroll for ${esc(monthLabel(ym))}</b></div>`;
+  const rows = list.map(st => ({ st, m: monthCalc(st, ym) }));
+  const T = rows.reduce((t, { m }) => { ['present','half','leave','absent','late','ot','base','otPay','ded','net'].forEach(k => t[k] = (t[k] || 0) + m[k]); return t; }, {});
+  if (S.detail) {
+    const r = rows.find(x => x.st.id === S.detail);
+    if (r) {
+      const { st, m } = r;
+      return h + `<div class="row"><button class="btn sm" data-act="closeDetail">‹ All staff</button></div>
+      <div class="card" style="display:grid;gap:10px"><div><div class="sname">${esc(st.name)}</div><div class="muted small">${esc(monthLabel(ym))} · ₹${esc(st.rate)}/hr · ${fmtHM(st.shiftStart)}–${fmtHM(st.shiftEnd)}</div></div>
+        <div class="row" style="gap:6px"><span class="chip c-good">${m.present} present</span><span class="chip c-info">${m.half} half</span><span class="chip c-warn">${m.leave} leave</span><span class="chip c-bad">${m.absent} absent</span></div>
+        <div class="pay"><div class="l"><span>Shift pay</span><span>${rs2(m.base)}</span></div><div class="l"><span>Overtime (${fmtDur(m.ot)})</span><span style="color:var(--good)">+${rs2(m.otPay)}</span></div><div class="l"><span>Late deduction (${fmtDur(m.late)}, ${m.lateDays} day${m.lateDays === 1 ? '' : 's'})</span><span style="color:var(--bad)">−${rs2(m.ded)}</span></div><div class="l big"><span>Net payout</span><span>${rs(m.net)}</span></div></div></div>
+      <h2>Daily log</h2>
+      <div class="tablewrap"><table><thead><tr><th>Date</th><th>Status</th><th>In</th><th>Out</th><th>Late</th><th>OT</th><th>Where</th><th>Day pay</th></tr></thead><tbody>${m.days.length ? m.days.map(({ iso, rec, c }) => `<tr><td>${esc(dayLabel(iso))}</td><td>${STATUS[rec.status]}</td><td>${fmtHM(rec.in)}</td><td>${fmtHM(rec.out)}</td><td class="${c.late ? 'neg' : ''}">${c.late ? fmtDur(c.late) : '—'}</td><td class="${c.ot ? 'pos' : ''}">${c.ot ? fmtDur(c.ot) : '—'}</td><td>${esc(rec.inDist ? locLabel(rec.inDist) : rec.edited === 'TRUE' ? 'admin' : '—')}</td><td>${rs2(c.base + c.otPay - c.ded)}</td></tr>`).join('') : '<tr><td colspan="8" class="muted" style="text-align:left">No entries</td></tr>'}</tbody></table></div>
+      <div class="grid2"><button class="btn pri" data-act="exportXlsx" data-id="${st.id}">Export Excel</button><button class="btn" data-act="exportPdf" data-id="${st.id}">Export PDF</button></div>`;
+    }
+    S.detail = null;
+  }
+  return h + `<div class="card"><div class="muted small">${esc(monthLabel(ym))} · total payout</div><div style="font-size:30px;font-weight:300" class="num">${rs(T.net)}</div>
+    <div class="row small muted num" style="gap:14px;margin-top:4px"><span>Shift ${rs(T.base)}</span><span style="color:var(--good)">OT +${rs(T.otPay)}</span><span style="color:var(--bad)">Late −${rs(T.ded)}</span></div></div>
+  <h2>Monthly summary</h2>
+  <div class="tablewrap"><table><thead><tr><th>Staff</th><th>Present</th><th>Half</th><th>Leave</th><th>Absent</th><th>Late</th><th>OT</th><th>Shift pay</th><th>OT pay</th><th>Deduction</th><th>Net</th></tr></thead><tbody>
+  ${rows.map(({ st, m }) => `<tr data-act="detail" data-id="${st.id}" style="cursor:pointer"><td><u>${esc(st.name)}</u></td><td>${m.present}</td><td>${m.half}</td><td>${m.leave}</td><td>${m.absent}</td><td class="${m.late ? 'neg' : ''}">${fmtDur(m.late)}</td><td class="${m.ot ? 'pos' : ''}">${fmtDur(m.ot)}</td><td>${rs(m.base)}</td><td>${rs(m.otPay)}</td><td>${rs(m.ded)}</td><td><b>${rs(m.net)}</b></td></tr>`).join('')}
+  <tr class="tot"><td>Total</td><td>${T.present}</td><td>${T.half}</td><td>${T.leave}</td><td>${T.absent}</td><td>${fmtDur(T.late)}</td><td>${fmtDur(T.ot)}</td><td>${rs(T.base)}</td><td>${rs(T.otPay)}</td><td>${rs(T.ded)}</td><td>${rs(T.net)}</td></tr></tbody></table></div>
+  <p class="note">Tap a name for that person's daily check-in, check-out, late and overtime log.</p>
+  <div class="grid2"><button class="btn pri" data-act="exportXlsx">Export Excel</button><button class="btn" data-act="exportPdf">Export PDF</button></div>`;
+}
+
+function vSettings() {
+  const s = S.settings, R = rules(), kiosks = s.kiosks || [];
+  return `<h2>Pay rules</h2>
+  <form class="card" id="rulesForm" style="display:grid;gap:14px">
+    <label class="f">Overtime rate<select id="r_ot">${[1, 1.25, 1.5, 2].map(v => `<option value="${v}" ${R.otMult === v ? 'selected' : ''}>${v}× hourly rate</option>`).join('')}</select></label>
+    <label class="f">Grace period before late<select id="r_grace">${[0, 5, 10, 15].map(v => `<option value="${v}" ${R.grace === v ? 'selected' : ''}>${v ? v + ' minutes' : 'No grace — count from the first minute'}</option>`).join('')}</select></label>
+    <label class="f">Leave days<select id="r_leave"><option value="0" ${R.leavePaid ? '' : 'selected'}>Unpaid</option><option value="1" ${R.leavePaid ? 'selected' : ''}>Paid as a full shift</option></select></label>
+    <button class="btn pri" type="submit">Save pay rules</button>
+    <div class="note">Late deduction = late minutes × (hourly rate ÷ 60). At ₹60/hr: 15 min = ₹15, 30 min = ₹30. Overtime = minutes after shift end × rate ÷ 60 × ${R.otMult}.</div>
+  </form>
+  <h2>Check-in location</h2>
+  <form class="card" id="locForm" style="display:grid;gap:12px">
+    <label class="f">Café name<input type="text" id="l_name" value="${esc(s.cafeName || '')}"></label>
+    <div class="grid2"><label class="f">Latitude<input type="number" step="any" id="l_lat" value="${esc(s.cafeLat)}"></label><label class="f">Longitude<input type="number" step="any" id="l_lng" value="${esc(s.cafeLng)}"></label></div>
+    <div class="grid2"><label class="f">Allowed distance (m)<input type="number" min="50" step="10" id="l_rad" value="${esc(s.radiusM || 400)}"></label><label class="f">Max GPS error (m)<input type="number" min="20" step="10" id="l_acc" value="${esc(s.maxAcc || 250)}"></label></div>
+    <div class="grid2"><button class="btn" type="button" data-act="useHere">Use my location</button><button class="btn" type="button" data-act="testLoc">Test my distance</button></div>
+    <button class="btn pri" type="submit">Save location</button>
+  </form>
+  <h2>Café PC</h2>
+  <div class="card" style="display:grid;gap:12px">
+    <div class="muted small">A registered café computer lets staff check in without phone location, for days when a phone has no GPS, no battery or no internet. It logs people out after one minute.</div>
+    ${S.kiosk ? `<div class="banner" style="background:var(--good-bg);color:var(--good)">This device is registered as “${esc(S.kiosk.name)}”.</div><button class="btn" data-act="forgetKiosk">Stop using this device as café PC</button>` :
+      `<form id="kioskForm" class="row" style="gap:8px"><input type="text" id="k_name" value="Café PC" class="sp" aria-label="Name for this computer"><button class="btn pri" type="submit">Register this computer</button></form>`}
+    ${kiosks.length ? `<div style="display:grid;gap:8px">${kiosks.map(k => `<div class="row"><div class="sp"><b>${esc(k.name)}</b><div class="muted small">Added ${esc(new Date(k.addedAt).toLocaleDateString('en-IN'))}</div></div><button class="btn sm danger" data-act="removeKiosk" data-id="${k.id}">Remove</button></div>`).join('')}</div>` : '<div class="note">No café PC registered yet. Open this app on the café computer, log in as admin, and tap Register.</div>'}
+  </div>
+  <h2>My account</h2>
+  <div class="card" style="display:grid;gap:8px"><div><b>${esc(S.me.name)}</b> <span class="muted small">@${esc(S.me.username)}</span></div><details><summary>Change my PIN</summary>${pinForm()}</details><button class="btn" data-act="logout">Log out</button></div>`;
+}
+
+function render() {
+  const tabs = $('#tabs'), admin = isAdmin() && S.token;
+  tabs.hidden = !admin;
+  document.querySelectorAll('nav.tabs button').forEach(b => { b.removeAttribute('aria-current'); if (b.dataset.tab === S.tab) b.setAttribute('aria-current', 'page'); });
+  $('#hdrSub').textContent = S.me ? (S.kiosk ? 'Café PC · ' : '') + S.me.name : S.kiosk ? 'Café PC' : 'Attendance & payroll';
+  const v = $('#view'), y = window.scrollY;
+  v.style.paddingBottom = admin ? '' : '40px';
+  if (!S.token) v.innerHTML = vLogin();
+  else if (S.loading || !S.me) v.innerHTML = `<div class="card empty"><b>Loading…</b><span class="muted">Getting today's attendance.</span></div>${S.msg ? `<div class="banner">${esc(S.msg)}</div><button class="btn" data-act="logout">Log out</button>` : ''}`;
+  else if (!admin) v.innerHTML = vMyDay();
+  else v.innerHTML = S.tab === 'today' ? vToday() : S.tab === 'staff' ? vStaff() : S.tab === 'reports' ? vReports() : vSettings();
+  window.scrollTo(0, y);
+  updHint();
+}
+function updHint() {
+  const h = $('#sf_hint'); if (!h) return;
+  const st = { shiftStart: $('#sf_s').value, shiftEnd: $('#sf_e').value }, rate = Number($('#sf_rate').value) || 0, sm = shiftMins(st);
+  h.textContent = sm ? `${fmtDur(sm)} shift · ₹${Math.round(sm / 60 * rate).toLocaleString('en-IN')} a full day · ₹${(rate / 60).toFixed(2)} a minute` : '';
+}
+
+/* ---------- export ---------- */
+function saveFile(filename, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); toast('Downloaded ' + filename);
+}
+function exportRows(only) {
+  const ym = S.month, list = S.staff.filter(s => only ? s.id === only : (s.active !== false || Object.values(S.att).some(r => r.month === ym && r.staffId === s.id)));
+  const summary = [], daily = [];
+  for (const st of list) {
+    const m = monthCalc(st, ym);
+    summary.push({ Staff: st.name, Role: st.role || '', 'Rate (₹/hr)': Number(st.rate) || 0, Shift: `${st.shiftStart}-${st.shiftEnd}`, Present: m.present, 'Half-day': m.half, Leave: m.leave, Absent: m.absent, 'Late (min)': Math.round(m.late), 'Late days': m.lateDays, 'Overtime (min)': Math.round(m.ot), 'Shift pay (₹)': +m.base.toFixed(2), 'OT pay (₹)': +m.otPay.toFixed(2), 'Late deduction (₹)': +m.ded.toFixed(2), 'Net payout (₹)': +m.net.toFixed(2) });
+    for (const { iso, rec, c } of m.days) daily.push({ Date: iso, Staff: st.name, Status: STATUS[rec.status], 'Check-in': rec.in || '', 'Check-out': rec.out || '', 'Late (min)': Math.round(c.late), 'Overtime (min)': Math.round(c.ot), 'Worked (min)': Math.round(c.worked), Where: rec.inDist ? locLabel(rec.inDist) : rec.edited === 'TRUE' ? 'admin' : '', 'Day pay (₹)': +(c.base + c.otPay - c.ded).toFixed(2) });
+  }
+  daily.sort((a, b) => a.Date.localeCompare(b.Date) || a.Staff.localeCompare(b.Staff));
+  return { summary, daily, list };
+}
+const fname = (only, list, ext) => `Cheri_Payroll_${S.month}${only && list[0] ? '_' + list[0].name.replace(/\W+/g, '_') : ''}.${ext}`;
+function exportXlsx(only) {
+  if (!window.XLSX) { toast('Excel export is still loading. Try again in a moment'); return; }
+  const { summary, daily, list } = exportRows(only), wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet(summary.length ? summary : [{ Staff: 'No staff' }]); ws1['!cols'] = Object.keys(summary[0] || { a: 1 }).map(k => ({ wch: Math.max(10, k.length + 2) }));
+  const ws2 = XLSX.utils.json_to_sheet(daily.length ? daily : [{ Date: '', Staff: 'No entries' }]); ws2['!cols'] = [12, 20, 10, 10, 10, 11, 14, 13, 18, 12].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws1, 'Summary'); XLSX.utils.book_append_sheet(wb, ws2, 'Daily log');
+  saveFile(fname(only, list, 'xlsx'), new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+}
+function exportPdf(only) {
+  const J = window.jspdf?.jsPDF; if (!J) { toast('PDF export is still loading. Try again in a moment'); return; }
+  const { summary, daily, list } = exportRows(only), R = rules();
+  const doc = new J({ orientation: 'landscape', unit: 'pt', format: 'a4' }), Rs = v => 'Rs ' + Math.round(v).toLocaleString('en-IN');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.setTextColor(61, 29, 14); doc.text('CHERI CAFE & EATERY', 40, 48);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(138, 116, 97);
+  doc.text(`Attendance & payroll - ${monthLabel(S.month)}${only && list[0] ? ' - ' + list[0].name : ''}`, 40, 66);
+  doc.text(`Rules: OT ${R.otMult}x, grace ${R.grace} min, leave ${R.leavePaid ? 'paid' : 'unpaid'}; late deduction = late minutes x (hourly rate / 60)`, 40, 82);
+  const head = { fillColor: [61, 29, 14], textColor: [252, 250, 246], fontStyle: 'bold' }, alt = { fillColor: [245, 238, 228] };
+  doc.autoTable({ startY: 98, headStyles: head, styles: { fontSize: 9, cellPadding: 5 }, alternateRowStyles: alt,
+    head: [['Staff', 'Rate/hr', 'Present', 'Half', 'Leave', 'Absent', 'Late', 'OT', 'Shift pay', 'OT pay', 'Deduction', 'Net payout']],
+    body: summary.map(s => [s.Staff, 'Rs ' + s['Rate (₹/hr)'], s.Present, s['Half-day'], s.Leave, s.Absent, fmtDur(s['Late (min)']), fmtDur(s['Overtime (min)']), Rs(s['Shift pay (₹)']), Rs(s['OT pay (₹)']), Rs(s['Late deduction (₹)']), Rs(s['Net payout (₹)'])]),
+    foot: summary.length > 1 ? [['Total', '', '', '', '', '', '', '', ...['Shift pay (₹)', 'OT pay (₹)', 'Late deduction (₹)', 'Net payout (₹)'].map(k => Rs(summary.reduce((a, s) => a + s[k], 0)))]] : undefined,
+    footStyles: { fillColor: [225, 210, 189], textColor: [61, 29, 14], fontStyle: 'bold' } });
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(61, 29, 14); doc.text('Daily log', 40, doc.lastAutoTable.finalY + 30);
+  doc.autoTable({ startY: doc.lastAutoTable.finalY + 40, headStyles: head, styles: { fontSize: 8.5, cellPadding: 4 }, alternateRowStyles: alt,
+    head: [['Date', 'Staff', 'Status', 'Check-in', 'Check-out', 'Late', 'Overtime', 'Worked', 'Where', 'Day pay']],
+    body: daily.length ? daily.map(d => [d.Date, d.Staff, d.Status, d['Check-in'] ? fmtHM(d['Check-in']) : '-', d['Check-out'] ? fmtHM(d['Check-out']) : '-', d['Late (min)'] ? fmtDur(d['Late (min)']) : '-', d['Overtime (min)'] ? fmtDur(d['Overtime (min)']) : '-', d['Worked (min)'] ? fmtDur(d['Worked (min)']) : '-', d.Where.replace('₹', 'Rs ') || '-', Rs(d['Day pay (₹)'])]) : [['No entries', '', '', '', '', '', '', '', '', '']] });
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(138, 116, 97); doc.text(`Generated ${new Date().toLocaleString('en-IN')} - Page ${i} of ${n}`, 40, doc.internal.pageSize.getHeight() - 20); }
+  saveFile(fname(only, list, 'pdf'), doc.output('blob'));
+}
+
+/* ---------- actions ---------- */
+async function adminSet(st, patch) {
+  const id = `${S.date}_${st.id}`, prev = S.att[id] || { id, staffId: st.id, date: S.date, month: monthOf(S.date), status: '', in: '', out: '' };
+  const next = { ...prev, ...patch, edited: 'TRUE' };
+  if (next.status === 'absent' || next.status === 'leave') { next.in = ''; next.out = ''; }
+  S.att[id] = next; render();
+  try { const j = await api('setAttendance', { staffId: st.id, date: S.date, status: next.status, in: next.in, out: next.out }); S.att[id] = j.record; render(); }
+  catch (e) { S.att[id] = prev; render(); toast(e.message); }
+}
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-act],[data-tab]'); if (!t) return;
+  if (t.dataset.tab) { S.tab = t.dataset.tab; S.detail = null; S.editStaff = null; if (S.tab === 'reports') loadMonth(S.month); render(); window.scrollTo(0, 0); return; }
+  const a = t.dataset.act, st = S.staff.find(s => s.id === t.dataset.id);
+  try {
+    if (a === 'logout') await logout();
+    else if (a === 'punch') {
+      const k = t.dataset.k; S.busy = k; render();
+      let payload = { kind: k };
+      if (S.kiosk) payload.kioskKey = S.kiosk.key;
+      else { const p = await getPos(); if (p.err) { S.busy = null; render(); toast(p.err, 5000); return; } payload = { ...payload, lat: p.lat, lng: p.lng, acc: p.acc }; }
+      try {
+        const j = await api('punch', payload); S.att[j.record.id] = j.record;
+        S.busy = null; render();
+        toast(`Checked ${k} at ${fmtHM(k === 'in' ? j.record.in : j.record.out)}${S.kiosk ? '' : ` · ${j.distance} m from café`}`, 4000);
+        if (S.kiosk && !isAdmin()) setTimeout(() => { if (S.token) logout(); }, 4000);
+      } catch (e) { S.busy = null; render(); toast(e.message, 6000); }
+    }
+    else if (a === 'refresh') { await loadMonth(monthOf(S.date), true); toast('Updated'); }
+    else if (a === 'prevDay' || a === 'nextDay') { S.date = shiftISO(S.date, a === 'prevDay' ? -1 : 1); render(); loadMonth(monthOf(S.date)); }
+    else if (a === 'goToday') { S.date = S.today; render(); }
+    else if (a === 'status' && st) await adminSet(st, { status: t.dataset.s });
+    else if (a === 'clear' && st) { const id = `${S.date}_${st.id}`, prev = S.att[id]; delete S.att[id]; render(); try { await api('clearAttendance', { staffId: st.id, date: S.date }); } catch (e) { S.att[id] = prev; render(); toast(e.message); } }
+    else if (a === 'newStaff') { S.tab = 'staff'; S.editStaff = { rate: 60, shiftStart: '11:00', shiftEnd: '20:00', active: true }; S.delConfirm = false; render(); window.scrollTo(0, 0); }
+    else if (a === 'editStaff' && st) { S.editStaff = { ...st }; S.delConfirm = false; render(); window.scrollTo(0, 0); }
+    else if (a === 'cancelStaff') { S.editStaff = null; render(); }
+    else if (a === 'askDelete') { S.delConfirm = true; render(); }
+    else if (a === 'cancelDelete') { S.delConfirm = false; render(); }
+    else if (a === 'deleteStaff') {
+      const purge = !!$('#del_purge')?.checked;
+      await api('deleteStaff', { id: t.dataset.id, purge });
+      S.staff = S.staff.filter(s => s.id !== t.dataset.id);
+      if (purge) Object.keys(S.att).forEach(k => { if (S.att[k].staffId === t.dataset.id) delete S.att[k]; });
+      S.editStaff = null; S.delConfirm = false; render(); toast('Staff member deleted');
+    }
+    else if (a === 'prevMonth' || a === 'nextMonth') { const [y, m] = S.month.split('-').map(Number); const d = new Date(y, m - 1 + (a === 'prevMonth' ? -1 : 1), 1); S.month = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; S.detail = null; render(); loadMonth(S.month); }
+    else if (a === 'detail') { S.detail = t.dataset.id; render(); window.scrollTo(0, 0); }
+    else if (a === 'closeDetail') { S.detail = null; render(); }
+    else if (a === 'exportXlsx') exportXlsx(t.dataset.id);
+    else if (a === 'exportPdf') exportPdf(t.dataset.id);
+    else if (a === 'useHere' || a === 'testLoc') {
+      t.disabled = true; const p = await getPos(); t.disabled = false;
+      if (p.err) { toast(p.err, 5000); return; }
+      if (a === 'useHere') { $('#l_lat').value = p.lat.toFixed(6); $('#l_lng').value = p.lng.toFixed(6); toast(`Filled in (±${Math.round(p.acc)} m). Tap Save location`); }
+      else { const d = Math.round(distM(p.lat, p.lng, Number(S.settings.cafeLat), Number(S.settings.cafeLng))); toast(`${d} m from the café (±${Math.round(p.acc)} m) · ${d <= (S.settings.radiusM || 400) ? 'inside' : 'outside'} the zone`, 5000); }
+    }
+    else if (a === 'removeKiosk') { await api('removeKiosk', { id: t.dataset.id }); S.settings.kiosks = (S.settings.kiosks || []).filter(k => k.id !== t.dataset.id); render(); toast('Café PC removed'); }
+    else if (a === 'forgetKiosk') { S.kiosk = null; LS.set('cheri-kiosk', null); render(); toast('This device is no longer the café PC'); }
+  } catch (e) { toast(e.message, 5000); }
+});
+document.addEventListener('change', async ev => {
+  const t = ev.target;
+  if (t.id === 'dateIn' && t.value) { S.date = t.value; render(); loadMonth(monthOf(S.date)); }
+  else if (t.id === 'monthIn' && t.value) { S.month = t.value; S.detail = null; render(); loadMonth(S.month); }
+  else if (t.dataset.act === 'time') { const st = S.staff.find(s => s.id === t.dataset.id); if (st) await adminSet(st, { [t.dataset.k]: t.value }); }
+});
+document.addEventListener('input', ev => { if (/^sf_/.test(ev.target.id)) updHint(); });
+document.addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const f = ev.target.id;
+  try {
+    if (f === 'loginForm') {
+      const username = $('#lg_user')?.value || '', pin = $('#lg_pin')?.value || '';
+      S.lastUser = username; S.busy = 'login'; S.msg = ''; render();
+      try {
+        const j = await api('login', { username, pin });
+        S.token = j.token; LS.set('cheri-token', j.token); if (!S.kiosk) LS.set('cheri-user', username.trim());
+        S.busy = null; await boot();
+      } catch (e) { S.busy = null; S.msg = e.message; render(); }
+    } else if (f === 'pinForm') {
+      await api('changePin', { oldPin: $('#pin_old').value, newPin: $('#pin_new').value }); toast('PIN changed'); render();
+    } else if (f === 'staffForm') {
+      const e = S.editStaff, body = { id: e.id, name: $('#sf_name').value, role: $('#sf_role').value, username: $('#sf_user').value, pin: $('#sf_pin').value || undefined, rate: Number($('#sf_rate').value) || 0, shiftStart: $('#sf_s').value, shiftEnd: $('#sf_e').value, isAdmin: $('#sf_admin').checked, active: $('#sf_active').checked };
+      S.busy = 'staff'; render();
+      try { const j = await api('saveStaff', { staff: body }); const i = S.staff.findIndex(s => s.id === j.staff.id); i >= 0 ? S.staff[i] = j.staff : S.staff.push(j.staff); if (j.staff.id === S.me.id) S.me = { ...S.me, ...j.staff }; S.editStaff = null; toast(e.id ? 'Saved' : `${j.staff.name} added · login @${j.staff.username}`); }
+      finally { S.busy = null; render(); }
+    } else if (f === 'rulesForm') {
+      const j = await api('saveSettings', { settings: { otMult: Number($('#r_ot').value), grace: Number($('#r_grace').value), leavePaid: $('#r_leave').value === '1' } });
+      S.settings = { ...S.settings, ...j.settings }; render(); toast('Pay rules saved');
+    } else if (f === 'locForm') {
+      const j = await api('saveSettings', { settings: { cafeName: $('#l_name').value, cafeLat: Number($('#l_lat').value), cafeLng: Number($('#l_lng').value), radiusM: Number($('#l_rad').value) || 400, maxAcc: Number($('#l_acc').value) || 250 } });
+      S.settings = { ...S.settings, ...j.settings }; render(); toast('Location saved');
+    } else if (f === 'kioskForm') {
+      const j = await api('registerKiosk', { name: $('#k_name').value });
+      S.kiosk = { key: j.kioskKey, name: j.kiosk.name, id: j.kiosk.id }; LS.set('cheri-kiosk', S.kiosk);
+      S.settings.kiosks = [...(S.settings.kiosks || []), j.kiosk]; render(); toast('This computer is now the café PC');
+    }
+  } catch (e) { toast(e.message, 5000); }
+});
+
+boot();
+})();
+</script>
+
+</body></html>
